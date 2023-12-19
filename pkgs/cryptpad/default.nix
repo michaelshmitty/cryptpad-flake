@@ -13,11 +13,10 @@ buildNpmPackage rec {
 
   npmDepsHash = "sha256-kMpagy38UpQpQvfsEnNMJYUtO1XfpeEnvRD6TeValTc=";
 
-  # cryptpad build tries to write in cache dir
+  # The Cryptpad build tries to write to the cache
   makeCacheWritable = true;
 
-  # npm install apparently drops some directories generated during build,
-  # just cp...
+  # npm install seems to drop some directories generated during the build. Just copy instead.
   dontNpmInstall = true;
   installPhase = ''
     out_cryptpad="$out/lib/node_modules/cryptpad"
@@ -27,7 +26,7 @@ buildNpmPackage rec {
 
     # cryptpad assumes it runs in the source directory and also outputs
     # its state files there, which is not exactly great for us.
-    # There are relative paths everywhere so just substituing source paths
+    # There are relative paths everywhere so just substituting source paths
     # is difficult and will likely break on a future update, instead we
     # can either make links we want to source files locally when we run,
     # or make links to a likely place where we'll want to store files
@@ -52,6 +51,6 @@ buildNpmPackage rec {
     description = "Collaborative office suite, end-to-end encrypted and open-source.";
     homepage = "https://cryptpad.org/";
     license = licenses.agpl3;
-    maintainers = with maintainers; [ martinetd ];
+    maintainers = with maintainers; [ martinetd michaelshmitty ];
   };
 }
