@@ -3,7 +3,7 @@
 This [Nix flake](https://nixos.wiki/wiki/Flakes) provides a Nix package and NixOS module for
 [Cryptpad](https://cryptpad.org/).
 
-The NixOS module targets the latest release of NixOS. That’s 23.11.
+The NixOS module targets the latest release of NixOS, currently 23.11.
 
 ## Notes
 
