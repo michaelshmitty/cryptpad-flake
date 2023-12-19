@@ -22,7 +22,7 @@ in
   # Some workaround due to cryptpad being a disabled module name:
   # Disabling the rename.nix module is necessary to be able to use the name 'cryptpad'
   disabledModules = [ "rename.nix" ];
-  # This import is necessary when disabling the rename.nix module above
+  # The following import is necessary when disabling the rename.nix module above
   imports = [
     (lib.mkAliasOptionModuleMD [ "environment" "checkConfigurationOptions" ] [ "_module" "check" ])
   ];
