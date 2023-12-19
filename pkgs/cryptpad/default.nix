@@ -2,25 +2,19 @@
 
 buildNpmPackage rec {
   pname = "cryptpad";
-  version = "5.4.0";
+  version = "5.5.0";
 
   src = fetchFromGitHub {
     owner = "cryptpad";
     repo = pname;
     rev = version;
-    hash = "sha256-bFFtWRb9VbSQZ3zPmFRGHqenFLeTPmvgk8t+u+/u5eA=";
+    hash = "sha256-EBFO/9zjlphkOEO80QhB3iB7TeoxO6+aThHY5n0aaG4=";
   };
 
-  npmDepsHash = "sha256-x9XZjMntVI0wf55SRHL63YLo5knvNhbKTu3kNzGNrU4=";
+  npmDepsHash = "sha256-kMpagy38UpQpQvfsEnNMJYUtO1XfpeEnvRD6TeValTc=";
 
   # cryptpad build tries to write in cache dir
   makeCacheWritable = true;
-
-  patches = [
-    # fix some config handling. Reported as
-    # https://github.com/cryptpad/cryptpad/pull/1212
-    ./0002-don-t-ignore-config-s-httpAddress.patch
-  ];
 
   # npm install apparently drops some directories generated during build,
   # just cp...
