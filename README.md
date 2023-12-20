@@ -1,22 +1,13 @@
-# cryptpad-flake
+# About this flake
 
-This [Nix flake](https://nixos.wiki/wiki/Flakes) provides a Nix package and NixOS module for
-[Cryptpad](https://cryptpad.org/).
+This Nix flake packages [Cryptpad](https://cryptpad.org/), a collaborative office suite that is end-to-end encrypted and open-source.
 
-The NixOS module targets the latest release of NixOS, currently 23.11.
+# Usage
 
-## Notes
+The primary use of this flake is deploying Cryptpad on NixOS. For that you would use the NixOS module available in `.#nixosModule`.
 
-* This flake was inspired by https://github.com/reckenrode/nix-foundryvtt and
-  [Installing Flakes into a NixOS 22.11 System](https://falconprogrammer.co.uk/blog/2023/02/nixos-22-11-flakes/).
-* There is [an active, open PR](https://github.com/NixOS/nixpkgs/pull/251687) to add Cryptpad back into nixpkgs.
-  I am contributing on there but I found it hard to test and iterate quickly with my infrastructure running on flakes.
-  The idea is to offer my implementation here to the PR and get Cryptpad back into
-  [nixpkgs](https://github.com/NixOS/nixpkgs).
-
-## How to use it
-
-1. Add this flake as an input to your flake
+## Using flakes
+1. Add this flake as an input
 
 ```nix
 {
@@ -47,11 +38,12 @@ The NixOS module targets the latest release of NixOS, currently 23.11.
 }
 ```
 
-2. In your configuration.nix for hostname put
+
+2. Now that you have the module available as an input, configuration is straightforward. See example:
 
 ```nix
-{ inputs, ... }:
-{
+{ inputs, ... }: {
+
   imports = [ inputs.cryptpad.nixosModules.cryptpad ];
 
   services.cryptpad = {
@@ -65,7 +57,13 @@ The NixOS module targets the latest release of NixOS, currently 23.11.
       adminKeys = [ "[user@cryptpad.example.com/Jil1apEPZ40j5M8nsjO1-deadbeefHkt+QExscMzKhs=]" ];
     };
   };
+
 }
 ```
 
-3. Deploy your configuration and enjoy Cryptpad at the configured URL!
+3. Deploy and check your Cryptpad setup at `https://<domain>/checkup`
+
+# Putting Cryptpad into Nixpkgs
+
+There is [an active, open PR](https://github.com/NixOS/nixpkgs/pull/251687) to add Cryptpad back into nixpkgs. I am
+contributing to that PR as well, but I found it hard to test and iterate quickly using my NixOS flake configuration.
