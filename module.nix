@@ -234,7 +234,7 @@ in
         };
         serviceConfig = {
           User = "cryptpad";
-          ExecStart = "${pkgs.cryptpad}/bin/cryptpad";
+          ExecStart = lib.getExe pkgs.cryptpad;
           PrivateTmp = true;
           Restart = "always";
           StateDirectory = "cryptpad";
