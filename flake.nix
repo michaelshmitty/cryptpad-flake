@@ -58,6 +58,7 @@
                 homepage = "https://cryptpad.org/";
                 license = licenses.agpl3Only;
                 maintainers = with maintainers; [ michaelshmitty ];
+                mainProgram = "cryptpad";
               };
             };
           };
