@@ -4,7 +4,7 @@ This Nix flake packages [Cryptpad](https://cryptpad.org/), a collaborative offic
 
 # Usage
 
-The primary use of this flake is deploying Cryptpad on NixOS. For that you would use the NixOS module available in `.#nixosModule`.
+With this flake you can deploy Cryptpad on NixOS. You can use the `cryptpad` module available in `.#nixosModules`.
 
 ## Using flakes
 1. Add this flake as an input
@@ -18,8 +18,6 @@ The primary use of this flake is deploying Cryptpad on NixOS. For that you would
       url = "github:nixos/nixpkgs/nixos-23.11";
     };
 
-    # Other inputs ...
-
     cryptpad = {
       url = "github:michaelshmitty/cryptpad-flake";
       inputs = {
@@ -28,28 +26,31 @@ The primary use of this flake is deploying Cryptpad on NixOS. For that you would
     };
   };
 
-  outputs = { self, nixpkgs, ... }@inputs: {
+  outputs = { self, nixpkgs, cryptpad }@inputs: {
     nixosConfigurations.myhostname = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
-      modules = [ ./configuration.nix ];
+      modules = [
+        ({ pkgs, ... }: {
+          nixpkgs.overlays = [ inputs.cryptpad.overlays.default ];
+        })
+        inputs.cryptpad.nixosModules.cryptpad
+        ./configuration.nix
+      ];
     };
   };
 }
 ```
 
-
-2. Now that you have the module available as an input, configuration is straightforward. See example:
+2. Now that you have the module available, configuration is straightforward. See example `configuration.nix`:
 
 ```nix
-{ inputs, ... }: {
+{ pkgs, lib, config, ... }:
 
-  imports = [ inputs.cryptpad.nixosModules.cryptpad ];
-
+{
   services.cryptpad = {
     enable = true;
     configureNginx = true;
-    config = {
+    settings = {
       httpUnsafeOrigin = "https://cryptpad.example.com";
       httpSafeOrigin = "https://cryptpad-ui.example.com";
 
@@ -57,13 +58,18 @@ The primary use of this flake is deploying Cryptpad on NixOS. For that you would
       adminKeys = [ "[user@cryptpad.example.com/Jil1apEPZ40j5M8nsjO1-deadbeefHkt+QExscMzKhs=]" ];
     };
   };
-
 }
 ```
 
 3. Deploy and check your Cryptpad setup at `https://<domain>/checkup`
 
-# Putting Cryptpad into Nixpkgs
+# Run tests
+This flake contains a simple integration test that will spin up a server NixOS container that will build and
+run Cryptpad and Nginx. And a client NixOS container that will test connectivity to the Cryptpad instance.
 
-There is [an active, open PR](https://github.com/NixOS/nixpkgs/pull/251687) to add Cryptpad back into nixpkgs. I am
-contributing to that PR as well, but I found it hard to test and iterate quickly using my NixOS flake configuration.
+Execute `nix flake check` in this repository to run the integration test.
+
+# Adding Cryptpad to nixpkgs
+
+There is [an active, open PR](https://github.com/NixOS/nixpkgs/pull/251687) to add Cryptpad back to nixpkgs. I am
+contributing my work on this flake into that PR.

@@ -1,27 +1,26 @@
-flake: { config, lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   inherit (lib) types strings mdDoc mkOption mkIf mkMerge;
-
-  inherit (flake.packages.${pkgs.stdenv.hostPlatform.system}) cryptpad;
 
   cfg = config.services.cryptpad;
 
   # The Cryptpad configuration file is not JSON, but a JavaScript source file that assigns a JSON configuration
   # object to a variable and exports it.
   configFile = builtins.toFile "cryptpad_config.js" ''
-    module.exports = ${builtins.toJSON cfg.config}
+    module.exports = ${builtins.toJSON cfg.settings}
   '';
 
   # Derive domain names for Nginx configuration from Cryptpad configuration
-  mainDomain = strings.removePrefix "https://" cfg.config.httpUnsafeOrigin;
+  mainDomain = strings.removePrefix "https://" cfg.settings.httpUnsafeOrigin;
   sandboxDomain =
-    if cfg.config.httpSafeOrigin == null then mainDomain else strings.removePrefix "https://" cfg.config.httpSafeOrigin;
-
+    if cfg.settings.httpSafeOrigin == null then
+      mainDomain else strings.removePrefix "https://" cfg.settings.httpSafeOrigin;
 in
 {
-  # Some workaround due to `cryptpad` being a disabled module name:
-  # Disabling the rename.nix module is necessary to be able to use the name 'cryptpad'
+  # FIXME: `cryptpad` is a disabled module name in nixpkgs.
+  # It can be used by disabling the rename.nix module.
+  # Hopefully this can be removed when https://github.com/NixOS/nixpkgs/pull/251687 gets merged.
   disabledModules = [ "rename.nix" ];
   # The following import is necessary when disabling the rename.nix module above
   imports = [
@@ -32,14 +31,6 @@ in
   options = {
     services.cryptpad = {
       enable = lib.mkEnableOption "cryptpad";
-
-      package = mkOption {
-        type = types.package;
-        default = cryptpad;
-        description = mdDoc ''
-          The Cryptpad package to use with the service.
-        '';
-      };
 
       configureNginx = mkOption {
         type = types.bool;
@@ -71,7 +62,7 @@ in
         '';
       };
 
-      config = mkOption {
+      settings = mkOption {
         type = types.submodule {
           freeformType = (pkgs.formats.json { }).type;
           options = {
@@ -166,7 +157,7 @@ in
               '';
             };
             logPath = mkOption {
-              type = types.oneOf [ types.str types.bool];
+              type = types.oneOf [ types.str types.bool ];
               default = false;
               description = mdDoc ''
                 Specifies the directory where logs are stored. Set to false (or nothing) if you'd rather
@@ -243,7 +234,7 @@ in
         };
         serviceConfig = {
           User = "cryptpad";
-          ExecStart = "${cfg.package}/bin/cryptpad";
+          ExecStart = "${pkgs.cryptpad}/bin/cryptpad";
           PrivateTmp = true;
           Restart = "always";
           StateDirectory = "cryptpad";
@@ -255,16 +246,16 @@ in
     (mkIf cfg.configureNginx {
       assertions = [
         {
-          assertion = cfg.config.httpUnsafeOrigin != "";
-          message = "services.cryptpad.config.httpUnsafeOrigin is required";
+          assertion = cfg.settings.httpUnsafeOrigin != "";
+          message = "services.cryptpad.settings.httpUnsafeOrigin is required";
         }
         {
-          assertion = strings.hasPrefix "https://" cfg.config.httpUnsafeOrigin;
-          message = "services.cryptpad.config.httpUnsafeOrigin must start with https://";
+          assertion = strings.hasPrefix "https://" cfg.settings.httpUnsafeOrigin;
+          message = "services.cryptpad.settings.httpUnsafeOrigin must start with https://";
         }
         {
-          assertion = cfg.config.httpSafeOrigin == null || strings.hasPrefix "https://" cfg.config.httpSafeOrigin;
-          message = "services.cryptpad.config.httpSafeOrigin must start with https:// (or be unset)";
+          assertion = cfg.settings.httpSafeOrigin == null || strings.hasPrefix "https://" cfg.settings.httpSafeOrigin;
+          message = "services.cryptpad.settings.httpSafeOrigin must start with https:// (or be unset)";
         }
       ];
 
@@ -274,11 +265,11 @@ in
         virtualHosts = mkMerge [
           {
             "${mainDomain}" = {
-              serverAliases = lib.optionals (cfg.config.httpSafeOrigin != null) [ sandboxDomain ];
+              serverAliases = lib.optionals (cfg.settings.httpSafeOrigin != null) [ sandboxDomain ];
               enableACME = true;
               forceSSL = true;
               locations."/" = {
-                proxyPass = "http://${cfg.config.httpAddress}:${builtins.toString cfg.config.httpPort}";
+                proxyPass = "http://${cfg.settings.httpAddress}:${builtins.toString cfg.settings.httpPort}";
                 proxyWebsockets = true;
                 extraConfig = ''
                   client_max_body_size ${cfg.clientMaxBodySize};
@@ -291,4 +282,6 @@ in
       };
     })
   ]);
+
+  meta.maintainers = with lib.maintainers; [ michaelshmitty ];
 }
