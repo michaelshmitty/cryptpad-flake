@@ -216,14 +216,6 @@ in
 
   config = mkIf cfg.enable (mkMerge [
     {
-      users = {
-        users.cryptpad = {
-          isSystemUser = true;
-          group = "cryptpad";
-        };
-        groups.cryptpad = { };
-      };
-
       systemd.services.cryptpad = {
         description = "Cryptpad service";
         wantedBy = [ "multi-user.target" ];
@@ -233,10 +225,10 @@ in
           HOME = "%S/cryptpad";
         };
         serviceConfig = {
-          User = "cryptpad";
           ExecStart = lib.getExe pkgs.cryptpad;
           PrivateTmp = true;
           Restart = "always";
+          DynamicUser = true;
           StateDirectory = "cryptpad";
           WorkingDirectory = "%S/cryptpad";
         };
