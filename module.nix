@@ -223,14 +223,48 @@ in
         environment = {
           CRYPTPAD_CONFIG = configFile;
           HOME = "%S/cryptpad";
+          PWD = "%S/cryptpad";
         };
+
+        # See https://github.com/cryptpad/cryptpad/blob/main/docs/cryptpad.service
         serviceConfig = {
-          ExecStart = lib.getExe pkgs.cryptpad;
-          PrivateTmp = true;
-          Restart = "always";
           DynamicUser = true;
           StateDirectory = "cryptpad";
+          ExecStart = lib.getExe pkgs.cryptpad;
           WorkingDirectory = "%S/cryptpad";
+          Restart = "always";
+          RestartSec = 2;
+          StandardOutput = "journal";
+          StandardError = "journal+console";
+          LimitNOFILE = 1000000;
+          ProcSubset = "all";
+          ProtectProc = "invisible";
+          CapabilityBoundingSet = "";
+          NoNewPrivileges = true;
+          ProtectSystem = "strict";
+          PrivateTmp = true;
+          PrivateDevices = true;
+          ProtectHostname = true;
+          ProtectKernelLogs = true;
+          ProtectKernelModules = true;
+          ProtectKernelTunables = true;
+          ProtectControlGroups = true;
+          RestrictAddressFamilies = "AF_INET AF_INET6 AF_NETLINK AF_UNIX";
+          RestrictNamespaces = true;
+          LockPersonality = true;
+          RestrictRealtime = true;
+          RestrictSUIDSGID = true;
+          RemoveIPC = true;
+          PrivateMounts = true;
+          ProtectClock = true;
+          ReadWritePaths = "%S/cryptpad";
+          SystemCallArchitectures = "native";
+          SystemCallFilter = [
+            "~@cpu-emulation @debug @keyring @ipc @mount @obsolete @privileged @setuid"
+            "@chown"
+            "pipe"
+            "pipe2"
+          ];
         };
       };
     }
