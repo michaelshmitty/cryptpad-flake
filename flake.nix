@@ -33,6 +33,12 @@
 
               makeCacheWritable = true;
 
+              patches = [
+                # Fix how safe/unsafe port configuration is handled.
+                # Reported as https://github.com/cryptpad/cryptpad/pull/1212
+                ./0001-correctly-listen-to-httpSafePort.patch
+              ];
+
               dontNpmInstall = true;
 
               installPhase = ''
