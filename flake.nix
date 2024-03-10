@@ -20,16 +20,16 @@
 
             cryptpad = pkgs.buildNpmPackage rec {
               pname = "cryptpad";
-              version = "5.6.0";
+              version = "5.7.0";
 
               src = pkgs.fetchFromGitHub {
                 owner = "cryptpad";
                 repo = "cryptpad";
                 rev = version;
-                hash = "sha256-A3tkXt4eAeg1lobCliGd2PghpkFG5CNYWnquGESx/zo=";
+                hash = "sha256-+EwrtLDn0OpnVbYDPB4Xw2W5rBPf5dr+5l3kInum0/E=";
               };
 
-              npmDepsHash = "sha256-tQUsI5Oz3rkAlxJ1LpolJNqZfKUGKUYSgtuCTzHRcW4=";
+              npmDepsHash = "sha256-43XeKTeLze0RVSy3pJBzFiSBXAOJR1cu/GV0o5Qek0M=";
 
               makeCacheWritable = true;
 
