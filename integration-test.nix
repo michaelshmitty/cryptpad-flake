@@ -1,17 +1,22 @@
-{ nixpkgs, cryptpadModule }:
-{ pkgs, ... }:
-let
+{
+  nixpkgs,
+  cryptpadModule,
+}: {pkgs, ...}: let
   certs = import "${nixpkgs}/nixos/tests/common/acme/server/snakeoil-certs.nix";
   serverDomain = certs.domain;
-in
-{
+in {
   name = "cryptpad";
-  meta.maintainers = with pkgs.lib.maintainers; [ michaelshmitty ];
+  meta.maintainers = with pkgs.lib.maintainers; [michaelshmitty];
 
-  nodes.server = { config, pkgs, lib, ... }: {
+  nodes.server = {
+    config,
+    pkgs,
+    lib,
+    ...
+  }: {
     virtualisation.memorySize = 4096;
 
-    imports = [ cryptpadModule ];
+    imports = [cryptpadModule];
 
     services.cryptpad = {
       enable = true;
@@ -43,15 +48,19 @@ in
       };
     };
 
-    security.pki.certificateFiles = [ certs.ca.cert ];
+    security.pki.certificateFiles = [certs.ca.cert];
 
-    networking.hosts."::1" = [ "${serverDomain}" ];
-    networking.firewall.allowedTCPPorts = [ 80 443 ];
+    networking.hosts."::1" = ["${serverDomain}"];
+    networking.firewall.allowedTCPPorts = [80 443];
   };
 
-  nodes.client = { pkgs, nodes, ... }: {
-    networking.hosts."${nodes.server.networking.primaryIPAddress}" = [ "${serverDomain}" ];
-    security.pki.certificateFiles = [ certs.ca.cert ];
+  nodes.client = {
+    pkgs,
+    nodes,
+    ...
+  }: {
+    networking.hosts."${nodes.server.networking.primaryIPAddress}" = ["${serverDomain}"];
+    security.pki.certificateFiles = [certs.ca.cert];
   };
 
   testScript = ''
