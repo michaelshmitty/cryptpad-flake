@@ -6,10 +6,6 @@ This Nix flake packages [Cryptpad](https://cryptpad.org/), a collaborative offic
 
 With this flake you can deploy Cryptpad on NixOS. You can use the `cryptpad` module available in `.#nixosModules`.
 
-## Using flakes
-
-### Add from GitHub
-
 ```nix
 {
   description = "Nix flake for my infrastructure";
@@ -42,23 +38,6 @@ With this flake you can deploy Cryptpad on NixOS. You can use the `cryptpad` mod
 }
 ```
 
-### Add from FlakeHub
-
-[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/michaelshmitty/cryptpad/badge)](https://flakehub.com/flake/michaelshmitty/cryptpad)
-
-Add the cryptpad flake to your `flake.nix`:
-
-```nix
-{
-  inputs.cryptpad.url = "https://flakehub.com/f/michaelshmitty/cryptpad/*.tar.gz";
-
-  outputs = { self, cryptpad }: {
-    # Use in your outputs
-  };
-}
-
-```
-
 ## Configure
 
 Now that you have the module available, configuration is straightforward. See example `configuration.nix`:
@@ -84,6 +63,7 @@ Now that you have the module available, configuration is straightforward. See ex
 Deploy and check your Cryptpad setup at `https://<domain>/checkup`
 
 # Run tests
+
 This flake contains a simple integration test that will spin up a server NixOS container that will build and
 run Cryptpad and Nginx. And a client NixOS container that will test connectivity to the Cryptpad instance.
 
