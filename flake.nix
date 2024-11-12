@@ -126,7 +126,7 @@
             # directory.
             makeWrapper "${lib.getExe pkgs.nodejs}" "$out/bin/cryptpad" \
               --add-flags "$out_cryptpad/server.js" \
-              --run "for d in customize.dist lib www; do ln -sf \"$out_cryptpad/\$d\" .; done" \
+              --run "for d in customize.dist lib www; do ${pkgs.coreutils}/bin/ln -sf \"$out_cryptpad/\$d\" .; done" \
               --run "if ! [ -d customize ]; then \"${lib.getExe pkgs.nodejs}\" \"$out_cryptpad/scripts/build.js\"; fi"
           '';
 
